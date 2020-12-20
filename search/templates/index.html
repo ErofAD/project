@@ -1,0 +1,14 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Search</h1>
+
+<h2>Dynamic content</h2>
+
+  <p>following record counts:</p>
+  <ul>
+    <li><strong>Search Phrase:</strong> {{ searchPhrase }}</li>
+    <li><strong>Phrase Version:</strong> {{ phraseVersion }}</li>
+  </ul>
+
+{% endblock %}
