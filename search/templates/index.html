@@ -7,8 +7,23 @@
 
   <p>following record counts:</p>
   <ul>
-    <li><strong>Search Phrase:</strong> {{ searchPhrase }}</li>
-    <li><strong>Phrase Version:</strong> {{ phraseVersion }}</li>
+    <li><strong>Search Phrase:</strong> {{ search_phrase }}</li>
+    <li><strong>Phrase Version:</strong> {{ phrase_version }}</li>
   </ul>
+
+<h1>Searching</h1>
+
+<form method="GET">
+    Question: <input type="text" name="search"><br/>
+    <input type="submit" value="Submit" />
+</form><br/><br/>
+
+
+<h1>List</h1>
+
+    {% for question in questions %}
+    <li>{{ question }}</li>
+    {% endfor %}
+
 
 {% endblock %}

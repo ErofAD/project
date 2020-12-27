@@ -3,11 +3,21 @@ from django.shortcuts import render
 # Create your views here.
 from .models import PhraseVersion, SearchPhrase
 
+
 def index(request):
-    searchPhrase = SearchPhrase.objects.all().count()
-    phraseVersion = PhraseVersion.objects.all().count()
+    search_phrase = SearchPhrase.objects.all().count()
+    phrase_version = PhraseVersion.objects.all().count()
+    questions = []
+    if request.GET.get('search'):
+        search = request.GET.get('search')
+        if search in SearchPhrase.objects.all():
+            questions.append(PhraseVersion.objects.all())
+        else:
+            questions.append(search)
+
     return render(
         request,
         'index.html',
-        context={'searchPhrase': searchPhrase, 'phraseVersion': phraseVersion}
+        context={'search_phrase': search_phrase, 'phrase_version': phrase_version, 'questions': questions}
     )
+
