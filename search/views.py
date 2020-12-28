@@ -13,7 +13,7 @@ def index(request):
     if request.GET.get('search'):
         search = request.GET.get('search')
         questions = Search.searching(search)
-        new_search_phrase = SearchPhrase(search_phrase=search, answers=questions)
+        new_search_phrase = SearchPhrase(phrase=search, answers=questions)
         new_search_phrase.save()
 
         # if search in SearchPhrase.objects.all():
