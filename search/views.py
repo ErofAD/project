@@ -18,11 +18,6 @@ def index(request):
         new_search_phrase = SearchPhrase(phrase=search, answers=questions)
         new_search_phrase.save()
 
-        # if search in SearchPhrase.objects.all():
-        #     questions.append(PhraseVersion.objects.all())
-        # else:
-        #     questions.append(search)
-
     return render(
         request,
         'index.html',
