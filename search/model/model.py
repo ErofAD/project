@@ -98,40 +98,44 @@ corpus_embeddings = torch.from_numpy(corpus_embeddings)
 
 print("Corpus loaded with {} sentences / embeddings".format(len(corpus_sentences)))
 
-while True:
-    inp_question = input("Please enter a question: ")
 
-    start_time = time.time()
-    question_embedding = model.encode(inp_question)
+class Search:
+    def searching(inp_question):
+        start_time = time.time()
+        question_embedding = model.encode(inp_question)
 
-    corpus_ids, scores = annoy_index.get_nns_by_vector(question_embedding, top_k_hits, include_distances=True)
-    hits = []
-    for id, score in zip(corpus_ids, scores):
-        hits.append({'corpus_id': id, 'score': 1-((score**2) / 2)})
+        corpus_ids, scores = annoy_index.get_nns_by_vector(question_embedding, top_k_hits, include_distances=True)
+        hits = []
+        for id, score in zip(corpus_ids, scores):
+            hits.append({'corpus_id': id, 'score': 1-((score**2) / 2)})
 
-    end_time = time.time()
+        end_time = time.time()
 
-    print("Input question:", inp_question)
-    print("Results (after {:.3f} seconds):".format(end_time-start_time))
-    for hit in hits[0:top_k_hits]:
-        print("\t{:.3f}\t{}".format(hit['score'], corpus_sentences[hit['corpus_id']]))
+        print("Input question:", inp_question)
+        print("Results (after {:.3f} seconds):".format(end_time-start_time))
+        return_results = []
+        for hit in hits[0:top_k_hits]:
+            return_results.append(corpus_sentences[hit['corpus_id']])
 
-    # Approximate Nearest Neighbor (ANN) is not exact, it might miss entries with high cosine similarity
-    # Here, we compute the recall of ANN compared to the exact results
-    correct_hits = util.semantic_search(question_embedding, corpus_embeddings, top_k=top_k_hits)[0]
-    correct_hits_ids = set([hit['corpus_id'] for hit in correct_hits])
+        return return_results
 
-    #Compute recall
-    ann_corpus_ids = set(corpus_ids)
-    if len(ann_corpus_ids) != len(correct_hits_ids):
-        print("Approximate Nearest Neighbor returned a different number of results than expected")
 
-    recall = len(ann_corpus_ids.intersection(correct_hits_ids)) / len(correct_hits_ids)
-    print("\nApproximate Nearest Neighbor Recall@{}: {:.2f}".format(top_k_hits, recall * 100))
-
-    if recall < 1:
-        print("Missing results:")
-        for hit in correct_hits[0:top_k_hits]:
-            if hit['corpus_id'] not in ann_corpus_ids:
-                print("\t{:.3f}\t{}".format(hit['score'], corpus_sentences[hit['corpus_id']]))
-    print("\n\n========\n")
+        # Approximate Nearest Neighbor (ANN) is not exact, it might miss entries with high cosine similarity
+        # Here, we compute the recall of ANN compared to the exact results
+        # correct_hits = util.semantic_search(question_embedding, corpus_embeddings, top_k=top_k_hits)[0]
+        # correct_hits_ids = set([hit['corpus_id'] for hit in correct_hits])
+        #
+        # #Compute recall
+        # ann_corpus_ids = set(corpus_ids)
+        # if len(ann_corpus_ids) != len(correct_hits_ids):
+        #     print("Approximate Nearest Neighbor returned a different number of results than expected")
+        #
+        # recall = len(ann_corpus_ids.intersection(correct_hits_ids)) / len(correct_hits_ids)
+        # print("\nApproximate Nearest Neighbor Recall@{}: {:.2f}".format(top_k_hits, recall * 100))
+        #
+        # if recall < 1:
+        #     print("Missing results:")
+        #     for hit in correct_hits[0:top_k_hits]:
+        #         if hit['corpus_id'] not in ann_corpus_ids:
+        #             print("\t{:.3f}\t{}".format(hit['score'], corpus_sentences[hit['corpus_id']]))
+        # print("\n\n========\n")

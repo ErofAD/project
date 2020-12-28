@@ -3,6 +3,8 @@ from django.shortcuts import render
 # Create your views here.
 from .models import PhraseVersion, SearchPhrase
 
+from .model.model import Search
+
 
 def index(request):
     search_phrase = SearchPhrase.objects.all().count()
@@ -10,10 +12,11 @@ def index(request):
     questions = []
     if request.GET.get('search'):
         search = request.GET.get('search')
-        if search in SearchPhrase.objects.all():
-            questions.append(PhraseVersion.objects.all())
-        else:
-            questions.append(search)
+        questions = Search.searching(search)
+        # if search in SearchPhrase.objects.all():
+        #     questions.append(PhraseVersion.objects.all())
+        # else:
+        #     questions.append(search)
 
     return render(
         request,
