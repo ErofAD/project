@@ -10,7 +10,7 @@ Assuming you have Python setup, run the following commands (if you're on Windows
   
    * python3 manage.py makemigrations
    
-   * python3 manage.py migrate
+   * python3 manage.py migrate --run-syncdb
    
    * python3 manage.py createsuperuser # Create a superuser
    
