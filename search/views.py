@@ -7,7 +7,7 @@ from .model.model import Search
 
 
 def index(request):
-    search_phrase = SearchPhrase.objects.all().count()
+    # search_phrase = SearchPhrase.objects.all().count()
     # phrase_version = PhraseVersion.objects.all().count()
     questions = []
     if request.GET.get('search'):
@@ -24,6 +24,6 @@ def index(request):
     return render(
         request,
         'index.html',
-        context={'search_phrase': search_phrase, 'questions': questions}
+        context={'questions': questions}
     )
 
