@@ -118,24 +118,3 @@ class Search:
             return_results.append(corpus_sentences[hit['corpus_id']])
 
         return return_results
-
-
-        # Approximate Nearest Neighbor (ANN) is not exact, it might miss entries with high cosine similarity
-        # Here, we compute the recall of ANN compared to the exact results
-        # correct_hits = util.semantic_search(question_embedding, corpus_embeddings, top_k=top_k_hits)[0]
-        # correct_hits_ids = set([hit['corpus_id'] for hit in correct_hits])
-        #
-        # #Compute recall
-        # ann_corpus_ids = set(corpus_ids)
-        # if len(ann_corpus_ids) != len(correct_hits_ids):
-        #     print("Approximate Nearest Neighbor returned a different number of results than expected")
-        #
-        # recall = len(ann_corpus_ids.intersection(correct_hits_ids)) / len(correct_hits_ids)
-        # print("\nApproximate Nearest Neighbor Recall@{}: {:.2f}".format(top_k_hits, recall * 100))
-        #
-        # if recall < 1:
-        #     print("Missing results:")
-        #     for hit in correct_hits[0:top_k_hits]:
-        #         if hit['corpus_id'] not in ann_corpus_ids:
-        #             print("\t{:.3f}\t{}".format(hit['score'], corpus_sentences[hit['corpus_id']]))
-        # print("\n\n========\n")
