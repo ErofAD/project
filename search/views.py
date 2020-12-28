@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from .models import SearchPhrase
 
-from .model.model import Search
+from .model.model import Model
 
 
 def index(request):
@@ -12,7 +12,9 @@ def index(request):
     questions = []
     if request.GET.get('search'):
         search = request.GET.get('search')
-        questions = Search.searching(search)
+        model = Model()
+        model.init_params()
+        questions = model.searching(search)
         new_search_phrase = SearchPhrase(phrase=search, answers=questions)
         new_search_phrase.save()
 
