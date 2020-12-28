@@ -12,4 +12,6 @@ Assuming you have Python setup, run the following commands (if you're on Windows
    
    * python3 manage.py migrate
    
+   * python3 manage.py createsuperuser # Create a superuser
+   
    * python3 manage.py runserver
