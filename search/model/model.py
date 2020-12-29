@@ -25,9 +25,6 @@ import torch
 from annoy import AnnoyIndex
 
 
-
-
-
 class Model:
     def __init__(self):
         self.model_name = 'distilbert-multilingual-nli-stsb-quora-ranking'
@@ -41,40 +38,36 @@ class Model:
         self.max_corpus_size = 100000
         self.n_trees = 256  # Number of trees used for Annoy. More trees => better recall, worse run-time
         self.embedding_size = 768  # Size of embeddings
-        self.dataset_path = "quora_duplicate_questions.tsv"
-
+        self.dataset_path = ["germ.tsv", "quora_duplicate_questions.tsv"]
 
     def init_params(self):
         url = "http://qim.fs.quoracdn.net/quora_duplicate_questions.tsv"
 
-        annoy_index_path = 'quora-embeddings-{}-size-{}-annoy_index-trees-{}.ann'.format(self.model_name.replace('/', '_'),
-                                                                                         self.max_corpus_size, self.n_trees)
-        embedding_cache_path = 'quora-embeddings-{}-size-{}.pkl'.format(self.model_name.replace('/', '_'), self.max_corpus_size)
-
+        annoy_index_path = 'idx-embeddings-{}-size-{}-annoy_index-trees-{}.ann'.format(
+            self.model_name.replace('/', '_'),
+            self.max_corpus_size, self.n_trees)
+        embedding_cache_path = 'idx-embeddings-{}-size-{}.pkl'.format(self.model_name.replace('/', '_'),
+                                                                      self.max_corpus_size)
         # Check if embedding cache path exists
+
         if not os.path.exists(embedding_cache_path):
-            # Check if the dataset exists. If not, download and extract
-            # Download dataset if needed
-            if not os.path.exists(self.dataset_path):
-                print("Download dataset")
-                util.http_get(url, self.dataset_path)
-
-            # Get all unique sentences from the file
             self.corpus_sentences = set()
-            with open(self.dataset_path, encoding='utf8') as fIn:
-                reader = csv.DictReader(fIn, delimiter='\t', quoting=csv.QUOTE_MINIMAL)
-                for row in reader:
-                    self.corpus_sentences.add(row['question1'])
-                    if len(self.corpus_sentences) >= self.max_corpus_size:
-                        break
+            for data in self.dataset_path:
+                if not os.path.exists(data):
+                    print("Download dataset")
+                    util.http_get(url, data)
 
-                    self.corpus_sentences.add(row['question2'])
-                    if len(self.corpus_sentences) >= self.max_corpus_size:
-                        break
+                with open(data, encoding='utf8') as fIn:
+                    reader = csv.DictReader(fIn, delimiter='\t', quoting=csv.QUOTE_MINIMAL)
+                    for row in reader:
+                        self.corpus_sentences.add(row['question1'])
+                        if len(self.corpus_sentences) >= self.max_corpus_size:
+                            break
 
             self.corpus_sentences = list(self.corpus_sentences)
             print("Encode the corpus. This might take a while")
-            self.corpus_embeddings = self.model.encode(self.corpus_sentences, show_progress_bar=True, convert_to_numpy=True)
+            self.corpus_embeddings = self.model.encode(self.corpus_sentences, show_progress_bar=True,
+                                                       convert_to_numpy=True)
 
             print("Store file on disc")
             with open(embedding_cache_path, "wb") as fOut:
@@ -111,17 +104,23 @@ class Model:
         start_time = time.time()
         question_embedding = self.model.encode(inp_question)
 
-        corpus_ids, scores = self.annoy_index.get_nns_by_vector(question_embedding, self.top_k_hits, include_distances=True)
+        corpus_ids, scores = self.annoy_index.get_nns_by_vector(question_embedding, self.top_k_hits,
+                                                                include_distances=True)
         hits = []
         for id, score in zip(corpus_ids, scores):
-            hits.append({'corpus_id': id, 'score': 1-((score**2) / 2)})
+            hits.append({'corpus_id': id, 'score': 1 - ((score ** 2) / 2)})
 
         end_time = time.time()
 
         print("Input question:", inp_question)
-        print("Results (after {:.3f} seconds):".format(end_time-start_time))
+        print("Results (after {:.3f} seconds):".format(end_time - start_time))
         return_results = []
         for hit in hits[0:self.top_k_hits]:
             return_results.append(self.corpus_sentences[hit['corpus_id']])
 
         return return_results
+
+
+model = Model()
+model.init_params()
+model.searching('question')
